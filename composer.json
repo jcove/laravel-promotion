@@ -1,0 +1,19 @@
+{
+  "name": "jcove/laravel-promotion",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "jcove",
+      "email": "jcove@163.com"
+    }
+  ],
+  "require": {},
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Jcove\\Promotion\\PromotionServiceProvider"
+      ]
+    }
+  }
+}
