@@ -9,5 +9,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProductPromotion extends Model
 {
-
+    protected $fillable  = ['product_id','product_name','price','start_time','end_time','type','promotion_id'];
 }

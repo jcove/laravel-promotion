@@ -47,15 +47,15 @@ class PromotionMain
         $array                                      =   [];
         if($products && count($products)){
             foreach ($products as $product){
-                $productPromotion                   =   new ProductPromotion();
-                $productPromotion->product_id       =   $product['product_id'];
-                $productPromotion->product_name     =   $product['product_name'];
-                $productPromotion->start_time       =   $this->promotion->start_time;
-                $productPromotion->end_time         =   $this->promotion->end_time;
-                $productPromotion->type             =   $this->promotion->type;
-                $productPromotion->promotion_id     =   $promotionId;
-                $productPromotion->save();
-                $array[]                            =   $productPromotion;
+
+                $productPromotion['product_id']       =   $product['product_id'];
+                $productPromotion['product_name']     =   $product['product_name'];
+                $productPromotion['start_time']       =   $this->promotion->start_time;
+                $productPromotion['end_time']         =   $this->promotion->end_time;
+                $productPromotion['type']             =   $this->promotion->type;
+                $productPromotion['promotion_id']     =   $promotionId;
+                $productPromotion['price']            =   $product['price'];
+                $array[]                              =   ProductPromotion::firstOrCreate($productPromotion);
             }
         }
         return $array;
@@ -128,20 +128,23 @@ class PromotionMain
      * @throws PromotionException
      */
     public function product($product){
-        $temp                                   =   new Product($product);
-        $product                                =   new Product($product);
+        $promotions                                 =   [];
+        $product                                    =   new Product($product);
 
-        $productPromotion                       =   ProductPromotion::where('product_id',$product->id)->where('start_time','<=',new Carbon())->firstOrFail();
-        if($productPromotion){
-            $promotion                          =   Promotion::getEnable($productPromotion->promotion_id);
-            $class                              =   '\Jcove\Promotion\Promotions\\'.ucwords($promotion->type);
-            if(!class_exists($class)){
-                throw new PromotionException(trans('promotion.validation.class_not_exist'));
+        $productPromotions                          =   ProductPromotion::where('product_id',$product->id)->where('start_time','<=',new Carbon())->get();
+        if($productPromotions){
+            foreach ($productPromotions as $row){
+                $promotion                          =   Promotion::getEnable($row->promotion_id);
+                $class                              =   '\Jcove\Promotion\Promotions\\'.ucwords($promotion->type);
+                if(!class_exists($class)){
+                    throw new PromotionException(trans('promotion.validation.class_not_exist'));
+                }
+                $promotions[]                       =   $promotion;
             }
-            $promotion->pushProduct($product);
-            $temp->promotion                 =   (new $class($promotion))->calculate();
+
+
         }
-        return $temp;
+        return $promotions;
     }
 
     /**
@@ -258,6 +261,8 @@ class PromotionMain
 
                 $router->post('promotion/register','PromotionController@register');
                 $router->post('promotion/product','PromotionController@product');
+                $router->get('promotion/query','PromotionController@query');
+                $router->get('promotion/search','PromotionController@search');
                 $router->post('promotion/products','PromotionController@products');
                 $router->resource('promotion', 'PromotionController');
 
