@@ -8,7 +8,9 @@
       "email": "jcove@163.com"
     }
   ],
-  "require": {},
+  "require": {
+    "illuminate/support": "^5.1"
+  },
   "extra": {
     "laravel": {
       "providers": [
