@@ -15,5 +15,10 @@
         "Jcove\\Promotion\\PromotionServiceProvider"
       ]
     }
+  },
+  "autoload": {
+    "psr-4": {
+      "Jcove\\Promotion\\": "src/"
+    }
   }
 }

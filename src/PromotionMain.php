@@ -152,7 +152,7 @@ class PromotionMain
      * @throws
      */
     protected function validatePromotion($promotionId){
-        $this->promotion                    =   Promotion::where('enable',Promotion::ENABLE)->FindOrFail($promotionId);
+        $this->promotion                    =   Promotion::FindOrFail($promotionId);
         if($this->promotion && $this->promotion->enable == Promotion::DISABLE){
             throw new PromotionException(trans('promotion.promotion_disabled'));
         }
@@ -208,6 +208,7 @@ class PromotionMain
                 'required',
                 Rule::in($types)
             ],
+            'description'                   =>  'required',
             'rule'                          =>  'required|json'
         ]);
         //验证
