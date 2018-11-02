@@ -47,7 +47,7 @@ class FullSubtraction
 
     public function calculate(){
         if($this->promotion->getGoodsAmount() >= $this->rule['full']){
-            $this->promotion->setPromotion( $this->rule['subtract']);
+            $this->promotion->setPromotion( round($this->rule['subtract'],2));
             $this->promotion->setPromotionAmount($this->promotion->getGoodsAmount()-$this->promotion->getPromotion());
         }else{
             $this->promotion->setPromotion(0);
@@ -56,7 +56,10 @@ class FullSubtraction
         if($this->promotion->getPromotion() > 0){
             $rate                                       =   $this->promotion->getPromotionAmount()/$this->promotion->getGoodsAmount();
             foreach ($this->promotion->getProducts() as $key=>$value){
-                $value->final_price                     =   round($rate*$value->price,2);
+                if($value->is_check){
+                    $value->final_price                     =   $rate*$value->price;
+                }
+
                 $this->promotion->putProduct($key,$value);
             }
         }

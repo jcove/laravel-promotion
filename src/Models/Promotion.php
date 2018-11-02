@@ -188,7 +188,10 @@ class Promotion  extends Model
         if(null==$this->goodsAmount){
             $this->goodsAmount                   =   0;
         }
-        $this->goodsAmount                       +=  $product->final_price*$product->num;
+        if($product->is_check){
+            $this->goodsAmount                       +=  $product->final_price*$product->num;
+        }
+
     }
 
     public function toArray(){

@@ -77,11 +77,12 @@ class PromotionMain
                     $product                            =   new Product($product);
 
                     $in[]                               =   $product->id;
-                    $originalProducts[$product->id]     =   $product;
+                    $originalProducts[$product->id.$product->price]     =   $product;
 
                 }
+
                 $promotions                             =   [];
-                $productPromotions                      =   ProductPromotion::whereIn('product_id',$in)->where('start_time','<=',new Carbon())->get();
+                $productPromotions                      =   ProductPromotion::whereIn('product_id',$in)->where('start_time','<=',new Carbon())->where('end_time','>=',new Carbon())->get();
 
                 if($productPromotions && count($productPromotions) > 0){
                     $promotionIds                       =   [];
@@ -91,8 +92,17 @@ class PromotionMain
                             $promotionIds[]             =   $productPromotion->promotion_id;
                             $promotions[$productPromotion->promotion_id]    =   Promotion::FindOrFail($productPromotion->promotion_id);
                         }
-                        $promotions[$productPromotion->promotion_id]->pushProduct($originalProducts[$productPromotion->product_id]);
-                        unset($originalProducts[$productPromotion->product_id]);
+
+                        foreach ($originalProducts as $row){
+                            if($row->id == $productPromotion->product_id){
+                                $prd = $originalProducts[$productPromotion->product_id.$row->price];
+                                $promotions[$productPromotion->promotion_id]->pushProduct($prd);
+                                unset($originalProducts[$productPromotion->product_id.$prd->price]);
+                            }
+
+                        }
+
+
                     }
                 }
                 if(count($originalProducts) > 0){
@@ -131,7 +141,7 @@ class PromotionMain
         $promotions                                 =   [];
         $product                                    =   new Product($product);
 
-        $productPromotions                          =   ProductPromotion::where('product_id',$product->id)->where('start_time','<=',new Carbon())->get();
+        $productPromotions                          =   ProductPromotion::where('product_id',$product->id)->where('start_time','<=',new Carbon())->where('end_time','>=',new Carbon())->get();
         if($productPromotions){
             foreach ($productPromotions as $row){
                 $promotion                          =   Promotion::getEnable($row->promotion_id);
